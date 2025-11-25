@@ -1,6 +1,5 @@
 import json
 import os
-import asyncio
 from telegram import (
     Update,
     InlineKeyboardMarkup,
@@ -32,7 +31,6 @@ def save_data(data):
 
 data = load_data()
 
-
 # ───────────────────────────────────────────
 # 🔐 Load bot token and admin IDs
 # ───────────────────────────────────────────
@@ -40,7 +38,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_IDS = os.getenv("ADMIN_IDS", "")
 
 ADMIN_IDS = [int(x.strip()) for x in ADMIN_IDS.split(",") if x.strip().isdigit()]
-
 
 def is_admin(user_id):
     return user_id in ADMIN_IDS
@@ -100,15 +97,25 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Send the broadcast message now.")
         return
 
-    # Add to Channel
+    # Add to Channel (manual instructions)
     if query.data == "add_channel":
-        chat_list = context.bot.chat_list
-        await query.edit_message_text("⚠ Telegram does NOT allow bots to fetch channels.\n\nPlease manually add the bot as Admin with 'Invite Users' permission.")
+        await query.edit_message_text(
+            "Telegram does NOT allow bots to automatically detect your channels.\n\n"
+            "👉 Please manually add the bot as an ADMIN in the channel.\n"
+            "✓ Enable: Invite Users\n"
+            "✓ Enable: Approve Join Requests (if approval mode is ON)\n\n"
+            "After adding, the bot will automatically start approving members."
+        )
         return
 
-    # Add to Group
+    # Add to Group (manual)
     if query.data == "add_group":
-        await query.edit_message_text("⚠ You must manually add the bot to your group as Admin with 'Add Members' permission.")
+        await query.edit_message_text(
+            "Please manually add the bot to your GROUP and grant admin permissions:\n\n"
+            "✓ Add Members\n"
+            "✓ Approve Join Requests (if required)\n\n"
+            "Once added, the bot will work automatically."
+        )
         return
 
 
